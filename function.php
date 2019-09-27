@@ -1,94 +1,81 @@
 <?php
 session_start();
 
-function redirect($url)
-{
-    header('Refresh: 3, url=' . $url);
-}
-
-function save2text($data, $file=null)
-{
-    if ($file == null){
-        $array = $GLOBALS['cfg'];
-        $file =  $array[$array['type']]['register'];
-    }
-
-    foreach ($data as $key => $value)
-    {
-        $text .=  $key . ":" . $value . ";";
-    }
-    $text .= "\r\n";
-    redirect('http://hello/profile.php');
-    $_SESSION['user'] = $data;
-    return "<h1>Регистрация успешна</h1>";
-}
-
 /*
- * проверим логин нового пользователя на совпадние с существующими
- * param $data array массив данных нового пользователя
- * param $users array массив с данными существующих пользователей
+ * проверим данные (логин) нового пользователя с существующими на совпадение
+ * @param $newUser Array массив данных нового пользователя
+ * @return bool
  */
-function checkExistUser($data, $users)
+function checkExistUser(Array $newUser = null)
 {
-    foreach ($users as $key => $value)
-    {
-        if ($data['login'] == $key)
-        {
-            return true;
+    if ($newUser == null){
+        if ($_POST){
+            $newUser = $_POST;
+        } else {
+            $newUser = [];
+        }
+    }
+    $existUsers = getFromJson();
+
+    if ($existUsers !== null){
+        foreach ($existUsers as $user){
+            if ($user['login'] == $newUser['login']){
+                return true;
+            }
         }
     }
     return false;
 }
 
+
 /*
  * Сохраняем данные (по умолчанию пользователя) в json
- * param $data : array  массив данных
- * param $file : string путь к файлу json, в который записываем
+ * @param Array $data  массив данных
+ * @param  String $file путь к файлу json, в который записываем
  */
 function save2json($data, $file = null)
 {
     if ($file == null){
-        $array = $GLOBALS['cfg'];
-        $file =  $array[$array['type']]['register'];
+        $file = $GLOBALS['config']['db_file'];
     }
-
-    if (isset($data['pass'])){
-        $data['pass'] = md5($data['pass']);
-    }
-
     $users = getFromJson();
-    if (is_array($users)){
-        if(checkExistUser($data, $users) == true){
-            redirect('/register.html');
-            return "<h1>Пользователь " . $data['login'] . " уже зарегистрирован</h1>";
-        }
+    if (checkExistUser() == false){
+        $data['pass'] = hash('sha256', $data['pass']);
+        $users [] = $data;
+        $json = json_encode($users);
+        file_put_contents($file, $json);
+
+        $_SESSION['user'] = $data;
+        $profile = $GLOBALS['config']['url']['profile'];
+        redirect(0, $profile);
+        return;
     }
-    $users[$data['login']] = $data;
-    $content = json_encode($users, true);
-    file_put_contents($file, $content );
-    redirect('http://hello/profile.php');
-    $_SESSION['user'] = $data;
-    return "<h1>Регистрация успешна</h1>";
+    redirect(2, '/register.html');
+    $GLOBALS['message'] =  "<h1>Пользователь с логином " . $data['login'] . " уже зарегистрирован</h1>";
 }
 
+
+/*
+ * Получаем данные в виде массива из файла json
+ * @param string $file путь к файлу
+ * @return []
+ */
 function getFromJson($file = null)
 {
     if ($file == null){
-        $array = $GLOBALS['cfg'];
-        $file =  $array[$array['type']]['register'];
+        $file = $GLOBALS['config']['db_file'];
     }
-    if (file_exists($file)){
-        $content = file_get_contents($file);
-        $data = json_decode($content, true);
-    }
-
-    if (is_array($data)){
-        return $data;
-    }
-    return null;
+    $string = file_get_contents($file);
+    $array = json_decode($string, true);
+    return $array;
 }
 
-function getFromText()
+/*
+ * Перенаправляем на другой адрес с задержкой
+ * @param int $time время задержки в сеундах
+ * @param string $url путь для редиректа
+ */
+function redirect($time = 3, $url = '/')
 {
-
+    header('Refresh: ' . $time . ', url=' . $url);
 }

@@ -1,22 +1,14 @@
 <?php
 session_start();
 
-$cfg = include 'config.php';
-$newData = $_POST;
+$config = require 'config.php';
+$data = $_POST;
 require 'function.php';
 
-switch ($cfg['type'])
-    {
-        case  'txt':
-            $message = save2text($newData);
-            break;
-        case  'json':
-            if ($_POST != null){
-                $message = save2json($newData);
-            }
-            break;
-    };
+save2json($_POST);
 
 
+if ($message !== null){
+    echo $message;
+}
 
-echo $message;

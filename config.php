@@ -1,14 +1,11 @@
 <?php
 return
     [
-        'type' => 'txt',
-        'profile' => '/profile.php',
-        'json' => [
-            'file' => 'data.json',
-            'register' => 'users.json'
-        ],
-        'txt' => [
-            'file' => 'data.txt',
-            'register' => 'users.txt'
+        'db_file' => 'users.json',
+
+        'url' => [
+            'profile' => '/profile.php',
+            'login' => '/login.html',
+            'news' => '/news/index.php'
         ]
     ];
