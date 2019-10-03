@@ -5,14 +5,16 @@
     <title>Регистрация</title>
 </head>
 <body>
-    <form action="register.php" method="post">
+    <form action="register.php" method="post" enctype="multipart/form-data">
         <input type="text" name="name" placeholder="Ваше имя" required><br>
         <input type="text" name="login" placeholder="здесь введи логин" required><br>
         <input type="password" name="pass" placeholder="Здесь введи пароль" required><br>
         <input type="email" name="email" placeholder="пример alex@yandex.ru" required><br>
         <input type="date" name="date" value="1998-06-26"><br>
+        <input type="file" name="avatar" value="Загрузить" placeholder="Выбрать файл с аватаркой">
         <input type="submit" value="отправить">
     </form>
     <a href="/"><input type="button" value="На главную"></a>
+<img src="">
 </body>
 </html>

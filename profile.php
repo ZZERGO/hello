@@ -15,7 +15,11 @@ if (isset($_GET['logout'])){
 $user = $_SESSION['user'];
 
 echo "<h1>Привет, " . $user['name'] . "</h1>";
+$avatar_path = $user['avatar'];
 
+
+echo '<img src="' . $avatar_path . '"';
+echo "<br>";
 echo "<p>Мой логин: <b>" . $user['login'] .  "</b></p>";
 echo "<p>Мой Email: <b>" . $user['email'] .  "</b></p>";
 echo "<p>Мой день рождения: <b>" . $user['date'] .  "</b></p>";

@@ -5,6 +5,7 @@ $config = require 'config.php';
 $data = $_POST;
 require 'function.php';
 
+
 save2json($_POST);
 
 

@@ -40,7 +40,10 @@ function save2json($data, $file = null)
     }
     $users = getFromJson();
     if (checkExistUser() == false){
+        $avatar = $GLOBALS['config']['avatars'] . $data['login'] . "_" .$_FILES['avatar']['name'];
+        move_uploaded_file($_FILES['avatar']['tmp_name'], __DIR__ . $avatar);
         $data['pass'] = hash('sha256', $data['pass']);
+        $data['avatar'] = $avatar;
         $users [] = $data;
         $json = json_encode($users);
         file_put_contents($file, $json);
@@ -52,6 +55,32 @@ function save2json($data, $file = null)
     }
     redirect(2, '/register.html');
     $GLOBALS['message'] =  "<h1>Пользователь с логином " . $data['login'] . " уже зарегистрирован</h1>";
+}
+
+
+function saveAvatar(){
+
+    $allow = [
+        'jpg',
+        'jpeg',
+        'bmp'
+    ];
+
+    if(!empty($_FILES)){
+        $tmp = $_FILES['avatar']['tmp_name'];
+        $name = mb_strtolower($_FILES['avatar']['name']);
+        $partName =  explode('.', $name);
+        $ext = array_pop($partName);
+        foreach ( $allow as $value ) {
+            if ($value == $ext){
+                $newname = $_POST['login'] . '_avatar.' . $ext;
+                move_uploaded_file($tmp,__DIR__.'\avatars\\' . $newname);
+                return $newname;
+            }
+        }
+        echo "Неверный тип файла";
+        die();
+    }
 }
 
 
